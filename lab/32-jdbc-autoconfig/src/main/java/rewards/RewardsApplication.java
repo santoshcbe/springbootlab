@@ -2,7 +2,12 @@ package rewards;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 // TODO-01 : Open pom.xml or build.gradle, look for TO-DO-01
 
@@ -22,7 +27,8 @@ import org.springframework.boot.SpringApplication;
 
 // TODO-13 (Optional) : Follow the instruction in the lab document.
 //           The section titled "Build and Run using Command Line tools".
-
+@SpringBootApplication
+@EnableConfigurationProperties(RewardsRecipientProperties.class)
 public class RewardsApplication {
     static final String SQL = "SELECT count(*) FROM T_ACCOUNT";
 
@@ -44,6 +50,15 @@ public class RewardsApplication {
     // - Use the JdbcTemplate bean that Spring Boot auto-configured for you
     // - Run this application and verify "Hello, there are 21 accounts" log message
     //   gets displayed in the console
+    @Bean
+    CommandLineRunner commandLineRunner(JdbcTemplate jdbcTemplate){
+
+        String QUERY = "SELECT count(*) FROM T_ACCOUNT";
+
+        return args -> System.out.println("Hello, there are "
+                + jdbcTemplate.queryForObject(QUERY, Long.class)
+                + " accounts");
+    }
 
     // TODO-08 (Optional): Enable full debugging in order to observe how Spring Boot
     //           performs its auto-configuration logic
@@ -53,5 +68,8 @@ public class RewardsApplication {
     // - Note that "DataSourceAutoConfiguration" is mentioned in both
     //   positive match and negative match - each match represents a single
     //   conditional statement in the "DataSourceAutoConfiguration" class.
-
+    @Bean
+    CommandLineRunner commandLineRunner2(RewardsRecipientProperties rewardsRecipientProperties) {
+        return args -> System.out.println("Recipient: " + rewardsRecipientProperties.getName());
+    }
 }
